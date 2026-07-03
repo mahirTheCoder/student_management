@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 app.use(router)
 dbConfig()
-console.log(process.env.BASE_URL);
+// console.log(process.env.BASE_URL);
 
 
 app.listen(PORT, () => {
