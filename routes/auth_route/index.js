@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const authRoutes = require("./auth_route");
+const loginRoute = require("./loginroute");
 
-router.use(process.env.BASE_URL, authRoutes);
+router.use("/auth", loginRoute);
 
 module.exports = router;
