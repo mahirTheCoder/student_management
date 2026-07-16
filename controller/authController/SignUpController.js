@@ -1,14 +1,18 @@
 const userSchema = require("../../models/userSchema");
 
 const signup = async (req, res) => {
-  const { name, email, password } = req.body;
-
+  
   try {
+    const { name, email, password } = req.body;
     if (!name) return res.status(400).send({ message: "Name is required" });
 
     if (!email) return res.status(400).send({ message: "Email is required" });
 
-    if (!password)
+    if (!isValidEmail(email)) {
+      return res.status(400).send({ message: "Invalid email format" });
+    }
+
+    if (!password || password.length < 6)
       return res.status(400).send({ message: "Password is required" });
 
     const existingUser = await userSchema.findOne({ email });
@@ -23,7 +27,7 @@ const signup = async (req, res) => {
       password,
     });
 
-    res.status(201).send(user);
+    res.status(200).send(user);
   } catch (error) {
     console.error(error);
     res.status(500).send({ message: "Internal server error" });
