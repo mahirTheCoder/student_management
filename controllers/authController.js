@@ -79,7 +79,7 @@ const verifyOtp = async (req, res) => {
 };
 
 // --------reSend otp controller
-const reSendOtp = async (req, res) => {
+const resendOtp = async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -120,7 +120,7 @@ const cookieConfig = {
 };
 
 // ----------signIn controller
-const signIn = async (req, res) => {
+const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -233,8 +233,8 @@ const updateProfile = async (req, res) => {
 module.exports = {
   signup,
   verifyOtp,
-  reSendOtp,
-  signIn,
+  resendOtp,
+  signin,
   getProfile,
   updateProfile,
   
