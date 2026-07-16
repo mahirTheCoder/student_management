@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 // ---------decode 
 const authMiddleware = (req, res, next) => {
   try {
-    const { accTkn } = req.cookies;
+    const  {accTkn}  = req.cookies;
     const decoded = jwt.verify(accTkn, process.env.JWT_SEC);
     if (decoded) {
       req.user = decoded;
