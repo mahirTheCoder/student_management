@@ -11,7 +11,7 @@ const {
 const userSchema = require("../models/userSchema");
 
 // -----------signUp Controler
-const signUp = async (req, res) => {
+const signup = async (req, res) => {
   const { fullname, email, password } = req.body;
   try {
     if (!fullname) return res.status(400).send("Fullname is required");
@@ -231,7 +231,7 @@ const updateProfile = async (req, res) => {
 
 
 module.exports = {
-  signUp,
+  signup,
   verifyOtp,
   reSendOtp,
   signIn,

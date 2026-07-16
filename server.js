@@ -8,7 +8,11 @@ const app = express()
 app.use(express.json())
 app.use(router)
 dbConfig()
-// console.log(process.env.BASE_URL);
+
+
+// // -----when db congfig not working then use this code t
+// // const dns = require('dns');
+// // dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 
 app.listen(PORT, () => {
