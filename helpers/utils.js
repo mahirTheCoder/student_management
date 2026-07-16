@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const cloudinary = require ('../configs/cloudinary')
+const { cloudinary } = require("../configs/cloudinary");
+// const cloudinary = require ('../configs/cloudinary')
 // --------email regex
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
