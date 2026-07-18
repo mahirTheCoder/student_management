@@ -7,8 +7,6 @@ const {
   generateRefreshToken,
   uploadCloudinary,
   destroyFromCloudinary,
-  // uploadCloudinary,
-  // destroyFromCloudinary,
 } = require("../helpers/utils");
 const userSchema = require("../models/userSchema");
 
@@ -80,6 +78,7 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+
 // --------reSend otp controller
 const resendOtp = async (req, res) => {
   const { email } = req.body;
@@ -113,6 +112,8 @@ const resendOtp = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+
 
 // ---------cookie configs
 const cookieConfig = {
@@ -153,6 +154,8 @@ const signin = async (req, res) => {
   }
 };
 
+
+
 // -----------profile controller
 const getProfile = async (req, res) => {
   try {
@@ -173,6 +176,8 @@ const getProfile = async (req, res) => {
     });
   }
 };
+
+
 
 // --------------update profile controller
 const updateProfile = async (req, res) => {
@@ -228,8 +233,6 @@ const updateProfile = async (req, res) => {
     });
   }
 };
-
-
 
 
 module.exports = {
