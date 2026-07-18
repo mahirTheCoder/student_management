@@ -78,7 +78,6 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-
 // --------reSend otp controller
 const resendOtp = async (req, res) => {
   const { email } = req.body;
@@ -112,8 +111,6 @@ const resendOtp = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-
 
 // ---------cookie configs
 const cookieConfig = {
@@ -154,6 +151,37 @@ const signin = async (req, res) => {
   }
 };
 
+// ----------forgret password controller
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) return res.status(400).send("Email is required");
+    if (!isValidEmail(email)) return res.status(400).send("Invalid email");
+
+    const user = await userSchema.findOne({ email });
+    if (!user) {
+      return res.status(400).send("User not found");
+    }
+
+    // Generate password reset token
+    const resetToken = user.createPasswordResetToken();
+
+    await user.save();
+
+    // Send reset link to user's email
+    await mailSender({
+      email: user.email,
+      subject: "Password Reset Request",
+      resetToken,
+    });
+
+    res.status(200).send("Password reset link sent to your email");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+}; 
 
 
 // -----------profile controller
@@ -161,7 +189,7 @@ const getProfile = async (req, res) => {
   try {
     const user = await userSchema.findOne(
       { _id: req.user._id },
-      { fullname: 1, email: 1, role: 1, avatar: 1, address: 1 }
+      { fullname: 1, email: 1, role: 1, avatar: 1, address: 1 },
     );
 
     if (!user) return res.status(400).send({ message: "Invalid request" });
@@ -175,8 +203,6 @@ const getProfile = async (req, res) => {
     });
   }
 };
-
-
 
 // --------------update profile controller
 const updateProfile = async (req, res) => {
@@ -232,13 +258,12 @@ const updateProfile = async (req, res) => {
   }
 };
 
-
 module.exports = {
   signup,
   verifyOtp,
   resendOtp,
   signin,
+  forgotPassword,
   getProfile,
   updateProfile,
-  
 };

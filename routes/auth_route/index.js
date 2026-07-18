@@ -7,6 +7,7 @@ const VerifyOtp = require("./verifyOtp.route");
 const resendOtp = require("./resendOtpRoute");
 const getProfile = require("./getProfileRoute");
 const updateProfile = require("./updatePrtofile");
+const forgotPassword = require("./forgetPassroute");
 
 
 router.use("/auth", Signup );
@@ -15,6 +16,6 @@ router.use("/auth", VerifyOtp);
 router.use("/auth", resendOtp);
 router.use("/auth", getProfile);
 router.use("/auth", updateProfile);
-
+router.use("/auth", forgotPassword);
 
 module.exports = router;
