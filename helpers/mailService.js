@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 const mailSender = async ({ email, subject, otp }) => {
   try {
     await transporter.sendMail({
-      from: '" Damo project Team" <team@example.com>',
+      from: '" Management project Team" <team@example.com>',
       to: email,
       subject,
       html: emailTemp({otp})

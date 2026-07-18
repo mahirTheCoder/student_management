@@ -164,7 +164,6 @@ const getProfile = async (req, res) => {
       { fullname: 1, email: 1, role: 1, avatar: 1, address: 1 }
     );
 
-    console.log(req.user);
     if (!user) return res.status(400).send({ message: "Invalid request" });
 
     res.status(200).send(user);
@@ -217,7 +216,6 @@ const updateProfile = async (req, res) => {
         return res.status(500).send({ message: "Failed to upload avatar" });
       }
     }
-    console.log(avatar);
 
     await user.save();
 
