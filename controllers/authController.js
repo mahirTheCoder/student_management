@@ -203,7 +203,56 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// -----------profile controller
+// -----------reset password controller
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    // -------- Validation
+    if (!password)
+      return res.status(400).send("Password is required");
+
+    if (password.length < 6)
+      return res
+        .status(400)
+        .send("Password must be at least 6 characters long");
+
+    // -------- Hash Token
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // -------- Find User
+    const user = await userSchema.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    }).select("+password");
+
+    if (!user) {
+      return res.status(400).send("Invalid or expired reset link");
+    }
+
+    // -------- Update Password
+    user.password = password;
+
+    // -------- Clear Reset Fields
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    // -------- Save User
+    await user.save();
+
+    res.status(200).send("Password reset successfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+
+// -----------profile controllerp
 const getProfile = async (req, res) => {
   try {
     const user = await userSchema.findOne(
@@ -283,6 +332,7 @@ module.exports = {
   resendOtp,
   signin,
   forgotPassword,
+  resetPassword,
   getProfile,
   updateProfile,
 };
