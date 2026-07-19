@@ -38,11 +38,11 @@ const userSchema = new mongoose.Schema({
   otpExpires: {
     type: Date,
   },
-role: {
+  role: {
     type: String,
     required: true,
-    enum: ["user", "admin", "moderator"],
-    default: "user",
+    enum: ["student", "admin", "teacher"],
+    default: "student",
   },
   otpverify: {
     type: Boolean,
@@ -59,7 +59,11 @@ role: {
   resetPasswordExpires: {
     type: Date,
   },
-timestamp: {
+  isApproved: {
+    type: Boolean,
+    default: false,
+  },
+  timestamp: {
     type: Date,
     default: Date.now,
   },
@@ -83,11 +87,9 @@ userSchema.methods.comparePassword = async function (userPassword) {
   return await bcrypt.compare(userPassword, this.password);
 };
 
-
 // ------------create password reset token
 
 userSchema.methods.createPasswordResetToken = function () {
-
   const resetToken = crypto.randomBytes(32).toString("hex");
 
   this.resetPasswordToken = crypto
@@ -98,8 +100,6 @@ userSchema.methods.createPasswordResetToken = function () {
   this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
-
 };
-
 
 module.exports = mongoose.model("User", userSchema);

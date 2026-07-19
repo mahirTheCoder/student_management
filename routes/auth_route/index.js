@@ -8,6 +8,7 @@ const resendOtp = require("./resendOtpRoute");
 const getProfile = require("./getProfileRoute");
 const updateProfile = require("./updatePrtofile");
 const forgotPassword = require("./forgetPassroute");
+const resetPassword = require("./resetPasswordRoute");
 
 
 router.use("/auth", Signup );
@@ -17,5 +18,6 @@ router.use("/auth", resendOtp);
 router.use("/auth", getProfile);
 router.use("/auth", updateProfile);
 router.use("/auth", forgotPassword);
+router.use("/auth", resetPassword);
 
 module.exports = router;

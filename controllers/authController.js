@@ -12,7 +12,7 @@ const userSchema = require("../models/userSchema");
 
 // -----------signUp Controler
 const signup = async (req, res) => {
-  const { fullname, email, password } = req.body;
+  const { fullname, email, password, role } = req.body;
   try {
     if (!fullname) return res.status(400).send("Fullname is required");
     if (!email) return res.status(400).send("Email is required");
@@ -21,6 +21,8 @@ const signup = async (req, res) => {
       return res
         .status(400)
         .send("Password is required and must be at least 6 characters long");
+
+        if (!role) return res.status(400).send("Role is required");
 
     // --------existing user
     const existingUser = await userSchema.findOne({ email });
@@ -35,16 +37,24 @@ const signup = async (req, res) => {
       fullname,
       email,
       password,
+      role,
       otp,
       otpExpires: Date.now() + 5 * 60 * 1000,
     });
 
     // ---------send otp to user mail
-    await mailSender({
-      email,
-      subject: "Otp Verifications ",
-      otp,
-    });
+  try {
+      await mailSender({
+        email,
+        subject: "OTP Verification",
+        otp,
+      });
+    } catch (mailError) {
+      console.error("Signup OTP Mail Error:", mailError);
+      return res.status(500).json({ success: false, message: "Failed to send OTP email. Please try again." });
+    }
+
+
     res.status(200).send("SignUp Successfully");
   } catch (err) {
     console.log(err);
@@ -152,56 +162,85 @@ const signin = async (req, res) => {
 };
 
 // ----------forgret password controller
+// ---------- Forgot Password Controller
+
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-
+    // -------- Validation
     if (!email) {
-      return res.status(400).json({ success: false, message: "Email is required" });
-    }
-    if (!isValidEmail(email)) {
-      return res.status(400).json({ success: false, message: "Invalid email format" });
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
     }
 
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email",
+      });
+    }
+
+    // -------- Find User
     const user = await userSchema.findOne({ email });
 
-    const successMessage = "If an account exists with that email, a reset link has been sent.";
+    // Security Response
+    const successMessage =
+      "If an account exists with that email, a password reset link has been sent.";
 
     if (!user) {
-      return res.status(200).json({ success: true, message: successMessage });
+      return res.status(200).json({
+        success: true,
+        message: successMessage,
+      });
     }
 
+    // -------- Generate Reset Token
     const resetToken = user.createPasswordResetToken();
 
+    // -------- Save Token
     await user.save({ validateBeforeSave: false });
 
+    // -------- Reset Link
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
+    // -------- Send Mail
     try {
       await mailSender({
         email: user.email,
         subject: "Password Reset Request",
-        resetToken,
         resetLink,
       });
     } catch (mailError) {
-
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
+
       await user.save({ validateBeforeSave: false });
-      
-      console.error("Mail sending failed:", mailError);
-      return res.status(500).json({ success: false, message: "Error sending reset email. Please try again." });
+
+      console.error(mailError);
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send reset email",
+      });
     }
 
-    return res.status(200).json({ success: true, message: successMessage });
-
+    return res.status(200).json({
+      success: true,
+      message: successMessage,
+    });
   } catch (error) {
-    console.error("Forgot Password Error:", error);
-    return res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
 };
+
 
 // -----------reset password controller
 const resetPassword = async (req, res) => {
