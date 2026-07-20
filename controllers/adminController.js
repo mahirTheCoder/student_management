@@ -1,18 +1,27 @@
-
 const userSchema = require("../models/userSchema");
 
+const allUserCheck = async (req, res, next) => {
+  try {
+    const allUsers = await userSchema.find({ role: ["student", "teacher"] });
 
-const adminCheck = async  (req, res, next) => {
+    if (!allUsers) {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
 
-  const allUsers = await userSchema.find({ role: [ 'student', 'teacher' ] });
+    console.log("All Users:", allUsers);
 
-  if (!allUsers) {
-    return res.status(403).json({ message: "Access denied. Admins only." });
+    // -------single data fetch
+    // const tecUser = await userSchema.find({ role: 'teacher' });
+    // console.log("Teacher Users:", tecUser);
+
+    // const studentUser = await userSchema.find({ role: 'student' });
+    // console.log("Student Users:", studentUser);
+
+    res.status(200).json({ message: "Admin check successful" });
+  } catch (error) {
+    console.error("Error in admin check:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-  console.log("All Users:", allUsers);
-
-res.status(200).json({ message: "Admin check successful" });
 };
 
-
-module.exports = { adminCheck };
+module.exports = { allUserCheck };

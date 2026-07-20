@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { adminCheck } = require("../../controllers/adminController");
+const { allUserCheck } = require("../../controllers/adminController");
 
 
 
-router.get("/check", adminCheck);
+router.get("/allUserCheck", allUserCheck);
+
 
 
 module.exports = router;
