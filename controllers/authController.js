@@ -42,6 +42,7 @@ const signup = async (req, res) => {
       role,
       otp,
       otpExpires: Date.now() + 5 * 60 * 1000,
+      isApproved: role === "student" ? true : false,
     });
 
     // ---------send otp to user mail
@@ -84,6 +85,7 @@ const verifyOtp = async (req, res) => {
     user.isVerified = true;
     user.otp = null;
     user.otpExpires = null;
+    user.otpverify = true;
     // ----------data abse save data
     await user.save();
 
