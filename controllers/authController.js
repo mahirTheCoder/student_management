@@ -1,5 +1,7 @@
 const { request } = require("express");
 const { mailSender } = require("../helpers/mailService");
+const crypto = require("crypto");
+
 const {
   generateOTP,
   isValidEmail,
@@ -22,7 +24,7 @@ const signup = async (req, res) => {
         .status(400)
         .send("Password is required and must be at least 6 characters long");
 
-        if (!role) return res.status(400).send("Role is required");
+    if (!role) return res.status(400).send("Role is required");
 
     // --------existing user
     const existingUser = await userSchema.findOne({ email });
@@ -43,7 +45,7 @@ const signup = async (req, res) => {
     });
 
     // ---------send otp to user mail
-  try {
+    try {
       await mailSender({
         email,
         subject: "OTP Verification",
@@ -51,9 +53,13 @@ const signup = async (req, res) => {
       });
     } catch (mailError) {
       console.error("Signup OTP Mail Error:", mailError);
-      return res.status(500).json({ success: false, message: "Failed to send OTP email. Please try again." });
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Failed to send OTP email. Please try again.",
+        });
     }
-
 
     res.status(200).send("SignUp Successfully");
   } catch (err) {
@@ -200,6 +206,8 @@ const forgotPassword = async (req, res) => {
     // -------- Generate Reset Token
     const resetToken = user.createPasswordResetToken();
 
+    console.log("Reset Token:", resetToken);
+
     // -------- Save Token
     await user.save({ validateBeforeSave: false });
 
@@ -241,56 +249,46 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-
 // -----------reset password controller
 const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
   try {
-    // -------- Validation
-    if (!password)
+    if (!password) {
       return res.status(400).send("Password is required");
+    }
 
-    if (password.length < 6)
+    if (password.length < 6) {
       return res
         .status(400)
         .send("Password must be at least 6 characters long");
+    }
 
-    // -------- Hash Token
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-    // -------- Find User
     const user = await userSchema.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
-    }).select("+password");
+    });
 
     if (!user) {
       return res.status(400).send("Invalid or expired reset link");
     }
 
-    // -------- Update Password
     user.password = password;
 
-    // -------- Clear Reset Fields
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
 
-    // -------- Save User
     await user.save();
 
-    res.status(200).send("Password reset successfully");
+    return res.status(200).send("Password reset successfully");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Server Error");
+    return res.status(500).send("Server Error");
   }
 };
-
-
 // -----------profile controllerp
 const getProfile = async (req, res) => {
   try {
