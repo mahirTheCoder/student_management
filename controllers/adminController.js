@@ -24,6 +24,30 @@ const allUserCheck = async (req, res) => {
   }
 };
 
+
+const studentUserCheck = async (req, res) => {
+  try {
+    const studentUsers = await userSchema.find({ role: "student" });
+
+    if (!studentUsers) {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    console.log("Student Users:", studentUsers);
+
+    // const studentUser = await userSchema.find({ role: 'student' });
+    // console.log("Student Users:", studentUser);
+
+    res.status(200).json({ message: "Admin check successful" });
+  } catch (error) {
+    console.error("Error in admin check:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+
 const approvedUserCheck = async (req, res) => {
     const params = req.params.id;
   try {
