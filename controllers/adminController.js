@@ -36,7 +36,6 @@ const studentUserCheck = async (req, res) => {
   }
 };
 
-
 // ---------teacherUserCheck
 const teacherUserCheck = async (req, res) => {
   try {
@@ -55,8 +54,6 @@ const teacherUserCheck = async (req, res) => {
   }
 };
 
-
-
 // ----------approvedUserCheck
 const approvedUserCheck = async (req, res) => {
   const params = req.params.id;
@@ -66,12 +63,10 @@ const approvedUserCheck = async (req, res) => {
       { isApproved: true },
       { new: true },
     );
-    res
-      .status(200)
-      .json({
-        message: "Approved users check successful",
-        users: approvedUsers,
-      });
+    res.status(200).json({
+      message: "Approved users check successful",
+      users: approvedUsers,
+    });
   } catch (error) {
     console.error("Error in approved users check:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -92,4 +87,10 @@ const deleteUserCheck = async (req, res) => {
   }
 };
 
-module.exports = { allUserCheck,studentUserCheck, teacherUserCheck, approvedUserCheck, deleteUserCheck };
+module.exports = {
+  allUserCheck,
+  studentUserCheck,
+  teacherUserCheck,
+  approvedUserCheck,
+  deleteUserCheck,
+};
